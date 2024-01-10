@@ -29,4 +29,4 @@ jobs:
         push: true
         tags: zhengpq/docker-test:latest
         build-args: |
-          APP_PORT=${{ secrets.PORT }}
+          app_port=${{ secrets.PORT }}
