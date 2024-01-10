@@ -1,32 +1,45 @@
 name: Build and Deploy Docker Image
 
 on:
-  push:
-    branches:
-      - main # 根据需要调整分支名称
+    push:
+        branches:
+            - main # 根据需要调整分支名称
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v1
 
-    - name: Login to DockerHub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+            - name: Login to DockerHub
+              uses: docker/login-action@v1
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        tags: zhengpq/docker-test:latest
-        build-args: |
-          APP_PORT=${{ secrets.PORT }}
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v2
+              with:
+                  context: .
+                  push: true
+                  tags: zhengpq/docker-test:latest
+                  build-args: |
+                      APP_PORT=${{ secrets.PORT }}
+
+            - name: Deploy to remote server
+              env:
+                  SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+              run: |
+                  sudo apt-get install -y sshpass
+                  sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no root@106.53.170.67 "
+                    docker stop ${{ secrets.DOCKER_CONTAINER_NAME }}
+                    docker rm ${{ secrets.DOCKER_CONTAINER_NAME }}
+                    echo '${{ secrets.DOCKERHUB_TOKEN }}' | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+                    docker pull ${{ secrets.DOCKER_USER_NAME }}/${{ secrets.DOCKER_CONTAINER_NAME }}:latest
+                    docker run -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} --name ${{ secrets.DOCKER_CONTAINER_NAME }} ${{ secrets.DOCKER_USER_NAME }}/${{ secrets.DOCKER_CONTAINER_NAME }}:latest
+                  "
