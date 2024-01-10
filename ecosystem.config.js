@@ -1,4 +1,4 @@
-console.log(process.env.PORT);
+console.log('pakizheng process.env.APP_PORT', process.env.APP_PORT);
 module.exports = {
     apps: [
         {
