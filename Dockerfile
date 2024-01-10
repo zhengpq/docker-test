@@ -43,7 +43,7 @@ EXPOSE 8001
 
 # 先安装npm依赖，因为源代码变更很频繁
 COPY package.json /
-COPY package-lock.json /
+# COPY package-lock.json /
 RUN npm install
 
 # 安装 PM2
