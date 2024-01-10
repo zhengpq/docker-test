@@ -38,14 +38,22 @@
 # CMD npm run dev
 
 FROM node:18.15.0
-# 镜像制作人
-# LABEL maintainer="2358460586@qq.com"
+
 EXPOSE 8001
+
 # 先安装npm依赖，因为源代码变更很频繁
 COPY package.json /
 COPY package-lock.json /
 RUN npm install
 
+# 安装 PM2
+RUN npm install pm2 -g
+
 COPY . /
+
+# 设置环境变量
+ARG APP_PORT
+ENV APP_PORT=$port
+
 #CMD ["node", "main.js"]
-CMD ["npm", "run", "dev"]
+CMD ["pm2-runtime", "./ecosystem.config.js", "--env production"]

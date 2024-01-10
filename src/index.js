@@ -14,12 +14,16 @@ app.post('/items', addItem);
 app.put('/items/:id', updateItem);
 app.delete('/items/:id', deleteItem);
 
-db.init().then(() => {
-    app.listen(8001, () => console.log('Listening on port 8001'));
-}).catch((err) => {
-    console.error(err);
-    process.exit(1);
-});
+db.init()
+    .then(() => {
+        app.listen(process.env.APP_PORT, () =>
+            console.log('Listening on port 8001'),
+        );
+    })
+    .catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });
 
 const gracefulShutdown = () => {
     db.teardown()
