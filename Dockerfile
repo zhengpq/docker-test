@@ -53,7 +53,7 @@ COPY . /
 
 # 设置环境变量
 ARG APP_PORT
-ENV APP_PORT=$app_port
+ENV APP_PORT=$APP_PORT
 
 #CMD ["node", "main.js"]
 CMD ["pm2-runtime", "./ecosystem.config.js", "--env production"]
